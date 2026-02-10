@@ -1,1 +1,3 @@
-# No third-party dependencies required for local run.
+# The application runtime uses only Python standard-library modules.
+# Keep this file for deterministic developer tooling and test setup.
+pytest==8.3.4

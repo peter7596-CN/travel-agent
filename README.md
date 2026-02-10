@@ -25,6 +25,15 @@ The bot orchestrates all requested stages:
 
 If `CONCUR_ACCESS_TOKEN` is not set, the app uses realistic mock responses for demos.
 
+## Setup
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
 ## Run
 
 ```bash
