@@ -23,7 +23,7 @@ The bot orchestrates all requested stages:
 - travel request creation
 - itinerary retrieval
 
-If `CONCUR_ACCESS_TOKEN` is not set, the app uses realistic mock responses for demos.
+If neither `CONCUR_ACCESS_TOKEN` nor `CONCUR_REFRESH_TOKEN` is set, the app uses realistic mock responses for demos.
 
 ## Setup
 
@@ -44,9 +44,23 @@ Open: `http://localhost:8000`
 
 ## Configure Concur API
 
+Use either direct bearer token mode:
+
 ```bash
 export CONCUR_BASE_URL="https://www.concursolutions.com"
 export CONCUR_ACCESS_TOKEN="<oauth_access_token>"
+python -m app.server
+```
+
+Or OAuth refresh-token mode (recommended for long-running deployments):
+
+```bash
+export CONCUR_BASE_URL="https://www.concursolutions.com"
+export CONCUR_CLIENT_ID="<concur_client_id>"
+export CONCUR_CLIENT_SECRET="<concur_client_secret>"
+export CONCUR_REFRESH_TOKEN="<concur_refresh_token>"
+# Optional override if your tenant uses a different auth host
+export CONCUR_TOKEN_URL="https://us2.api.concursolutions.com/oauth2/v0/token"
 python -m app.server
 ```
 

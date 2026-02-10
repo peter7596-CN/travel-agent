@@ -17,6 +17,10 @@ concur = ConcurClient(
     ConcurConfig(
         base_url=os.getenv("CONCUR_BASE_URL", "https://www.concursolutions.com"),
         access_token=os.getenv("CONCUR_ACCESS_TOKEN"),
+        client_id=os.getenv("CONCUR_CLIENT_ID"),
+        client_secret=os.getenv("CONCUR_CLIENT_SECRET"),
+        refresh_token=os.getenv("CONCUR_REFRESH_TOKEN"),
+        token_url=os.getenv("CONCUR_TOKEN_URL", "https://us2.api.concursolutions.com/oauth2/v0/token"),
     )
 )
 agent = TravelWorkflowAgent(concur)
