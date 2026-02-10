@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Executive Travel Agent</title>
+    <style>
+      :root { font-family: Inter, system-ui, -apple-system, sans-serif; }
+      body { margin: 0; background: #f3f7fb; color: #10233f; }
+      .shell { max-width: 900px; margin: 2rem auto; background: white; border-radius: 16px; box-shadow: 0 20px 40px #10233f1f; overflow: hidden; }
+      .header { padding: 1.25rem 1.5rem; background: #0f4fa8; color: white; }
+      .header p { margin: 0.35rem 0 0; opacity: 0.9; }
+      #chat { height: 60vh; overflow: auto; padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+      .msg { padding: 0.8rem 1rem; border-radius: 12px; max-width: 80%; white-space: pre-wrap; }
+      .user { align-self: flex-end; background: #d7e8ff; }
+      .assistant { align-self: flex-start; background: #eef2f7; }
+      .meta { font-size: 0.8rem; opacity: 0.7; margin-top: 0.4rem; }
+      .composer { display: flex; gap: 0.6rem; border-top: 1px solid #e3e7ef; padding: 1rem; }
+      input { flex: 1; border: 1px solid #c5d1e3; border-radius: 8px; padding: 0.8rem; }
+      button { border: 0; background: #0f4fa8; color: white; border-radius: 8px; padding: 0.8rem 1rem; cursor: pointer; }
+      .chips { padding: 0 1.5rem 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+      .chip { background: #edf4ff; color: #0f4fa8; border-radius: 999px; padding: 0.4rem 0.7rem; font-size: 0.8rem; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="header">
+        <h2>SAP Concur Executive Travel Agent</h2>
+        <p>Chatbot to run the end-to-end executive travel workflow.</p>
+      </section>
+      <section id="chat"></section>
+      <div class="chips">
+        <span class="chip">start new trip</span>
+        <span class="chip">next</span>
+        <span class="chip">show checklist</span>
+      </div>
+      <form class="composer" id="composer">
+        <input id="message" placeholder="Example: start new trip for ceo@corp.com to london" autocomplete="off" />
+        <button type="submit">Send</button>
+      </form>
+    </main>
+
+    <script>
+      const sessionId = crypto.randomUUID();
+      const chat = document.querySelector('#chat');
+      const form = document.querySelector('#composer');
+      const input = document.querySelector('#message');
+
+      const addMessage = (text, role, meta = '') => {
+        const node = document.createElement('div');
+        node.className = `msg ${role}`;
+        node.textContent = text;
+        if (meta) {
+          const m = document.createElement('div');
+          m.className = 'meta';
+          m.textContent = meta;
+          node.appendChild(m);
+        }
+        chat.appendChild(node);
+        chat.scrollTop = chat.scrollHeight;
+      };
+
+      async function sendMessage(message) {
+        addMessage(message, 'user');
+        try {
+          const resp = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId, message })
+          });
+
+          if (!resp.ok) {
+            throw new Error(`Chat request failed: ${resp.status}`);
+          }
+
+          const data = await resp.json();
+          addMessage(data.assistant_message, 'assistant', `Stage: ${data.stage}`);
+        } catch (err) {
+          addMessage(`I hit an error talking to the backend: ${err.message}`, 'assistant');
+        }
+      }
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const message = input.value.trim();
+        if (!message) return;
+        input.value = '';
+        sendMessage(message);
+      });
+
+      document.querySelectorAll('.chip').forEach((chip) => {
+        chip.addEventListener('click', () => sendMessage(chip.textContent));
+      });
+
+      addMessage('Hi, I can orchestrate the executive travel workflow with SAP Concur. Start by sharing traveler and destination.', 'assistant');
+    </script>
+  </body>
+</html>
